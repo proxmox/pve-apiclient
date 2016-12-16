@@ -1,0 +1,13 @@
+Source: libpve-apiclient-perl
+Section: perl
+Priority: optional
+Maintainer: Proxmox Support Team <support@proxmox.com>
+Build-Depends: debhelper (>= 9), perl
+Standards-Version: 3.9.5
+Homepage: http://www.proxmox.com
+
+Package: libpve-apiclient-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Proxmox VE API client library
+ This implements an API client for Proxmox VE in perl.
