@@ -30,3 +30,7 @@ distclean: clean
 clean:
 	rm -rf ./build *.deb *.changes
 	find . -name '*~' -exec rm {} ';'
+
+.PHONY: dinstall
+dinstall: ${DEB}
+	dpkg -i ${DEB}
