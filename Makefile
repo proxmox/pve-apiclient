@@ -23,6 +23,7 @@ install:
 	install -D -m 0644 PVE/APIClient/LWP.pm ${PERL5DIR}/PVE/APIClient/LWP.pm
 	install -d -m 755 ${DOCDIR}/examples
 	install -m 0755 examples/example1.pl ${DOCDIR}/examples
+	install -m 0755 examples/example2.pl ${DOCDIR}/examples
 
 .PHONY: upload
 upload: ${DEB}

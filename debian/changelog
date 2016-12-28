@@ -1,6 +1,6 @@
 libpve-apiclient-perl (1.0-2) unstable; urgency=medium
 
-  * add simple example code: example1.pl
+  * add simple example code: example1.pl and example2.pl
 
  -- Proxmox Support Team <support@proxmox.com>  Wed, 28 Dec 2016 10:46:52 +0100
 
