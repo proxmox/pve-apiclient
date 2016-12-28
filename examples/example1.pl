@@ -1,9 +1,11 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 # NOTE: you need to run this on a PVE host, or modify the source to
 # provide username/password/hostname from somewhere else.
 
 use strict;
+use warnings;
+
 use PVE::APIClient::LWP;
 
 use PVE::AccessControl;
