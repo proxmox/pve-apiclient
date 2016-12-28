@@ -31,6 +31,6 @@ my $conn = PVE::APIClient::LWP->new(
     manual_verification => 1,
     );
 
-my $res = $conn->get("api2/json/", {});
+my $res = $conn->get("/", {});
 
 print to_json($res, { pretty => 1, canonical => 1});
