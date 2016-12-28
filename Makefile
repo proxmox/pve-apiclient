@@ -24,6 +24,7 @@ install:
 	install -d -m 755 ${DOCDIR}/examples
 	install -m 0755 examples/example1.pl ${DOCDIR}/examples
 	install -m 0755 examples/example2.pl ${DOCDIR}/examples
+	install -m 0755 examples/perftest1.pl ${DOCDIR}/examples
 
 .PHONY: upload
 upload: ${DEB}
