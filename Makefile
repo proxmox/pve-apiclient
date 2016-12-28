@@ -1,12 +1,13 @@
 PACKAGE=libpve-apiclient-perl
 PKGVER=1.0
-PKGREL=1
+PKGREL=2
 
 DEB=${PACKAGE}_${PKGVER}-${PKGREL}_all.deb
 
 DESTDIR=
 
-PERL5DIR=/usr/share/perl5
+PERL5DIR=${DESTDIR}/usr/share/perl5
+DOCDIR=${DESTDIR}/usr/share/doc/${PACKAGE}
 
 all: ${DEB}
 
@@ -19,7 +20,9 @@ deb ${DEB}:
 	lintian ${DEB}
 
 install:
-	install -D -m 0644 PVE/APIClient/LWP.pm ${DESTDIR}${PERL5DIR}/PVE/APIClient/LWP.pm
+	install -D -m 0644 PVE/APIClient/LWP.pm ${PERL5DIR}/PVE/APIClient/LWP.pm
+	install -d -m 755 ${DOCDIR}/examples
+	install -m 0755 examples/example1.pl ${DOCDIR}/examples
 
 .PHONY: upload
 upload: ${DEB}
