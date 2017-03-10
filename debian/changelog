@@ -1,3 +1,9 @@
+libpve-apiclient-perl (2.0-1) unstable; urgency=medium
+
+  * bump version for debian stretch
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 10 Mar 2017 09:07:29 +0100
+
 libpve-apiclient-perl (1.0-2) unstable; urgency=medium
 
   * add simple example code: example1.pl, example2.pl and perftest1.pl

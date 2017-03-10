@@ -1,6 +1,6 @@
 PACKAGE=libpve-apiclient-perl
-PKGVER=1.0
-PKGREL=2
+PKGVER=2.0
+PKGREL=1
 
 DEB=${PACKAGE}_${PKGVER}-${PKGREL}_all.deb
 
@@ -28,7 +28,7 @@ install:
 
 .PHONY: upload
 upload: ${DEB}
-	tar cf - ${DEB} | ssh repoman@repo.proxmox.com upload
+	tar cf - ${DEB} | ssh -X repoman@repo.proxmox.com upload --product pmg,pve --dist stretch
 
 distclean: clean
 
