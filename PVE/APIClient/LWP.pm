@@ -87,7 +87,7 @@ sub update_ticket {
     $self->{ticket} = $ticket;
 
     my $encticket = uri_escape($ticket);
-    my $cookie = "PVEAuthCookie=$encticket; path=/; secure;";
+    my $cookie = "$self->{cookie_name}=$encticket; path=/; secure;";
     $agent->default_header('Cookie', $cookie);
 }
 
@@ -290,6 +290,7 @@ sub new {
 	host => $param{host} || 'localhost',
 	port => $param{port},
 	protocol => $param{protocol},
+	cookie_name => $param{cookie_name} // 'PVEAuthCookie',
 	manual_verification => $param{manual_verification},
 	cached_fingerprints => $param{cached_fingerprints} || {},
 	verify_fingerprint_cb => $param{verify_fingerprint_cb},
