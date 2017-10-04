@@ -2,12 +2,19 @@ Source: libpve-apiclient-perl
 Section: perl
 Priority: optional
 Maintainer: Proxmox Support Team <support@proxmox.com>
-Build-Depends: debhelper (>= 9), perl (>= 5.10.0-19)
+Build-Depends: debhelper (>= 9),
+               perl (>= 5.10.0-19),
 Standards-Version: 3.9.5
 Homepage: http://www.proxmox.com
 
 Package: libpve-apiclient-perl
 Architecture: all
-Depends: ${misc:Depends}, libio-socket-ssl-perl, libjson-perl, libcrypt-ssleay-perl, libhttp-message-perl, liburi-perl, libwww-perl
+Depends: libcrypt-ssleay-perl,
+         libhttp-message-perl,
+         libio-socket-ssl-perl,
+         libjson-perl,
+         liburi-perl,
+         libwww-perl,
+         ${misc:Depends},
 Description: Proxmox VE API client library
  This implements an API client for Proxmox VE in perl.
