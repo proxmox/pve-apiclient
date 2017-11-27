@@ -258,11 +258,8 @@ my $verify_cert_callback = sub {
 
     # check server certificate against cache of pinned FPs
     # get fingerprint of server certificate
-    my $fp;
-    eval {
-	$fp = Net::SSLeay::X509_get_fingerprint($cert, 'sha256');
-    };
-    return 0 if $@ || !defined($fp) || $fp eq ''; # error
+    my $fp = Net::SSLeay::X509_get_fingerprint($cert, 'sha256');
+    return 0 !defined($fp) || $fp eq ''; # error
 
     my $valid = $self->{cached_fingerprints}->{$fp};
     return $valid if defined($valid); # return cached result
