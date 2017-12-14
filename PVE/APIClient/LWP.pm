@@ -11,6 +11,7 @@ use JSON;
 use Data::Dumper; # fixme: remove
 use HTTP::Request::Common;
 use Carp;
+use PVE::APIClient::Exception qw(raise);
 
 my $extract_data = sub {
     my ($res) = @_;
@@ -121,7 +122,7 @@ sub login {
     }
 
     if (!$response->is_success) {
-	die $response->status_line . "\n";
+	raise($response->status_line ."\n", code => $response->code)
     }
 
     my $res = from_json($response->decoded_content, {utf8 => 1, allow_nonref => 1});
@@ -210,7 +211,7 @@ sub call {
 	} elsif ($method eq 'DELETE') {
 	    $response = $ua->request(HTTP::Request::Common::DELETE($uri));
 	} else {
-	    die "method $method not implemented\n";
+	    raise("method $method not implemented\n");
 	}
 	return $response;
     };
@@ -229,27 +230,21 @@ sub call {
 
     if ($response->is_success) {
 
-	die "got unexpected content type" if $ct !~ m|application/json|;
+	raise("got unexpected content type", code => $response->code)
+	    if $ct !~ m|application/json|;
 
 	return from_json($response->decoded_content, {utf8 => 1, allow_nonref => 1});
 
     } else {
 
-	my $msg = $response->status_line . "\n";
-	eval {
+	my $msg = $response->message;
+	my $errors = eval {
 	    return if $ct !~ m|application/json|;
 	    my $res = from_json($response->decoded_content, {utf8 => 1, allow_nonref => 1});
-	    if (my $errors = $res->{errors}) {
-		foreach my $key (keys %$errors) {
-		    my $m = $errors->{$key};
-		    chomp($m);
-		    $m =~s/\n/ -- /g;
-		    $msg .= " $key: $m\n";
-		}
-	    }
+	    return $res->{errors};
 	};
-	die $msg;
 
+	raise("$msg\n", code => $response->code, errors => $errors);
     }
 }
 
