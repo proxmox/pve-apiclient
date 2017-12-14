@@ -139,8 +139,7 @@ sub manual_verify_fingerprint {
     my ($self, $fingerprint) = @_;
 
     if (!$self->{manual_verification}) {
-	warn "fingerprint: $fingerprint\n";
-	return 0;
+	raise("fingerprint '$fingerprint' not verified, abort!\n");
     }
 
     print "The authenticity of host '$self->{host}' can't be established.\n" .
@@ -152,6 +151,8 @@ sub manual_verify_fingerprint {
     my $valid = ($answer =~ m/^\s*yes\s*$/i) ? 1 : 0;
 
     $self->{cached_fingerprints}->{$fingerprint} = $valid;
+
+    raise("Fingerprint not verified, abort!\n") if !$valid;
 
     if (my $cb = $self->{register_fingerprint_cb}) {
 	$cb->($fingerprint) if $valid;
