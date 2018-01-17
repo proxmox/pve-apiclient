@@ -1,3 +1,15 @@
+libpve-apiclient-perl (2.0-3) unstable; urgency=medium
+
+  * raise exception if manual fingerprint verification failed
+
+  * use new Exception.pm class to signal errors to caller
+
+  * add APIClient/Exception.pm class
+
+  * cleanup Net::SSLeay error handling
+
+ -- Proxmox Support Team <support@proxmox.com>  Wed, 17 Jan 2018 14:15:51 +0100
+
 libpve-apiclient-perl (2.0-2) unstable; urgency=medium
 
   * allow to specify cookie_name
