@@ -146,7 +146,7 @@ sub manual_verify_fingerprint {
 	"X509 SHA256 key fingerprint is $fingerprint.\n" .
 	"Are you sure you want to continue connecting (yes/no)? ";
 
-    my $answer = <>;
+    my $answer = <STDIN>;
 
     my $valid = ($answer =~ m/^\s*yes\s*$/i) ? 1 : 0;
 
