@@ -1,3 +1,11 @@
+libpve-apiclient-perl (2.0-4) unstable; urgency=medium
+
+  * fix a case where with the upcoming introduction of sub-commands
+    manual verification of fingerprints would read the user's response from a
+    file rather than stdin
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 22 Jan 2018 15:14:52 +0100
+
 libpve-apiclient-perl (2.0-3) unstable; urgency=medium
 
   * raise exception if manual fingerprint verification failed
