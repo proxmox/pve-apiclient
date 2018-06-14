@@ -6,20 +6,21 @@ package PVE::APIClient::Exception;
 
 use strict;
 use warnings;
-
-use base 'Exporter';
-
-use Storable qw(dclone);
+use vars qw(@ISA @EXPORT_OK);
+require Exporter;
+use Storable qw(dclone);       
 use HTTP::Status qw(:constants);
+
+@ISA = qw(Exporter);
 
 use overload '""' => sub {local $@; shift->stringify};
 use overload 'cmp' => sub {
     my ($a, $b) = @_;
-    local $@;
+    local $@;  
     return "$a" cmp "$b"; # compare as string
 };
 
-our @EXPORT_OK = qw(raise);
+@EXPORT_OK = qw(raise raise_param_exc raise_perm_exc);
 
 sub new {
     my ($class, $msg, %param) = @_;
@@ -31,7 +32,7 @@ sub new {
     };
 
     foreach my $p (keys %param) {
-	next if defined($self->{$p});
+	next if defined($self->{$p}); 
 	my $v = $param{$p};
 	$self->{$p} = ref($v) ? dclone($v) : $v;
     }
@@ -42,7 +43,52 @@ sub new {
 sub raise {
 
     my $exc = PVE::APIClient::Exception->new(@_);
+    
+    my ($pkg, $filename, $line) = caller;
 
+    $exc->{filename} = $filename;
+    $exc->{line} = $line;
+
+    die $exc;
+}
+
+sub raise_perm_exc {
+    my ($what) = @_;
+
+    my $param = { code => HTTP_FORBIDDEN };
+
+    my $msg = "Permission check failed";
+    
+    $msg .= " ($what)" if $what;
+
+    my $exc = PVE::APIClient::Exception->new("$msg\n", %$param);
+    
+    my ($pkg, $filename, $line) = caller;
+
+    $exc->{filename} = $filename;
+    $exc->{line} = $line;
+
+    die $exc;
+}
+
+sub is_param_exc {
+    my ($self) = @_;
+
+    return $self->{code} && $self->{code} eq HTTP_BAD_REQUEST;
+}
+
+sub raise_param_exc {
+    my ($errors, $usage) = @_;
+
+    my $param = {
+	 code => HTTP_BAD_REQUEST,
+	 errors => $errors,
+    };
+
+    $param->{usage} = $usage if $usage;
+
+    my $exc = PVE::APIClient::Exception->new("Parameter verification failed.\n", %$param);
+    
     my ($pkg, $filename, $line) = caller;
 
     $exc->{filename} = $filename;
@@ -53,13 +99,15 @@ sub raise {
 
 sub stringify {
     my $self = shift;
-
+    
     my $msg = $self->{code} ? "$self->{code} $self->{msg}" : $self->{msg};
 
     if ($msg !~ m/\n$/) {
+
 	if ($self->{filename} && $self->{line}) {
 	    $msg .= " at $self->{filename} line $self->{line}";
 	}
+
 	$msg .= "\n";
     }
 
@@ -86,7 +134,7 @@ sub stringify {
 sub PROPAGATE {
     my ($self, $file, $line) = @_;
 
-    push @{$self->{propagate}}, [$file, $line];
+    push @{$self->{propagate}}, [$file, $line]; 
 
     return $self;
 }
