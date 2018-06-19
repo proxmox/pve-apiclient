@@ -1,3 +1,10 @@
+libpve-apiclient-perl (2.0-5) unstable; urgency=medium
+
+  * add make target to copy and include files from pve-common - and
+    update Exception.pm
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 19 Jun 2018 13:05:34 +0200
+
 libpve-apiclient-perl (2.0-4) unstable; urgency=medium
 
   * fix a case where with the upcoming introduction of sub-commands
