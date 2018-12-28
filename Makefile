@@ -2,7 +2,9 @@ PACKAGE=libpve-apiclient-perl
 PKGVER=2.0
 PKGREL=4
 
+BUILDSRC := $(PACKAGE)-$(PKGVER)
 DEB=${PACKAGE}_${PKGVER}-${PKGREL}_all.deb
+DSC=${PACKAGE}_${PKGVER}-${PKGREL}.dsc
 
 DESTDIR=
 
@@ -12,15 +14,24 @@ DOCDIR=${DESTDIR}/usr/share/doc/${PACKAGE}
 PVE_COMMON_FILES=    		\
 	Exception.pm
 
+
 all: ${DEB}
 
+.PHONY: $(BUILDSRC)
+$(BUILDSRC):
+	rm -rf $(BUILDSRC)
+	rsync -a debian $(BUILDSRC)
+	make DESTDIR=./$(BUILDSRC) install
+
 .PHONY: deb
-deb ${DEB}:
-	rm -rf build
-	rsync -a debian build
-	make DESTDIR=./build install
-	cd build; dpkg-buildpackage -rfakeroot -b -us -uc
+deb ${DEB}: $(BUILDSRC)
+	cd $(BUILDSRC); dpkg-buildpackage -rfakeroot -b -us -uc
 	lintian ${DEB}
+
+.PHONY: dsc
+dsc: $(BUILDSRC)
+	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d -nc
+	lintian ${DSC}
 
 install:
 	install -D -m 0644 PVE/APIClient/LWP.pm ${PERL5DIR}/PVE/APIClient/LWP.pm
@@ -41,7 +52,7 @@ upload: ${DEB}
 distclean: clean
 
 clean:
-	rm -rf ./build *.deb *.changes *.buildinfo
+	rm -rf ./$(BUILDSRC) *.deb *.changes *.buildinfo *.dsc *.tar.gz
 	find . -name '*~' -exec rm {} ';'
 
 .PHONY: dinstall
