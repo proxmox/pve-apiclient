@@ -1,6 +1,6 @@
 PACKAGE=libpve-apiclient-perl
-PKGVER=2.0
-PKGREL=4
+PKGVER=$(shell dpkg-parsechangelog -Sversion | cut -d- -f1)
+PKGREL=$(shell dpkg-parsechangelog -Sversion | cut -d- -f2)
 
 BUILDSRC := $(PACKAGE)-$(PKGVER)
 DEB=${PACKAGE}_${PKGVER}-${PKGREL}_all.deb
