@@ -14,6 +14,7 @@ DOCDIR=${DESTDIR}/usr/share/doc/${PACKAGE}
 PVE_COMMON_FILES=    		\
 	Exception.pm
 
+GITVERSION:=$(shell git rev-parse HEAD)
 
 all: ${DEB}
 
@@ -22,6 +23,7 @@ $(BUILDSRC):
 	rm -rf $(BUILDSRC)
 	rsync -a debian $(BUILDSRC)
 	make DESTDIR=./$(BUILDSRC) install
+	echo "git clone git://git.proxmox.com/git/pve-apiclient.git\\ngit checkout ${GITVERSION}" > $(BUILDSRC)/debian/SOURCE
 
 .PHONY: deb
 deb ${DEB}: $(BUILDSRC)
