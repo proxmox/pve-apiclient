@@ -16,5 +16,6 @@ Depends: libcrypt-ssleay-perl,
          liburi-perl,
          libwww-perl,
          ${misc:Depends},
+         ${perl:Depends},
 Description: Proxmox VE API client library
  This implements an API client for Proxmox VE in perl.
