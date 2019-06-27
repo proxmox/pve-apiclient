@@ -102,12 +102,13 @@ sub login {
     $uri->path('/api2/json/access/ticket');
 
     my $ua = $self->{useragent};
+    my $username = $self->{username} // 'unknown',
 
     delete $self->{last_unknown_fingerprint};
 
     my $exec_login = sub {
 	return $ua->post($uri, {
-	    username => $self->{username} || 'unknown',
+	    username => $username,
 	    password => $self->{password} || ''});
     };
 
@@ -131,7 +132,7 @@ sub login {
 
     # TODO: make it possible to use tfa
     if ($data->{ticket} =~ m/^PVE:tfa!/) {
-	die "TFA in API is not yet implemented! Try disabling TFA for the user.\n";
+	raise("Two Factor Auth is not yet implemented! Try disabling TFA for the user '$username'.\n");
     }
 
     $self->update_ticket($data->{ticket});
