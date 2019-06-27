@@ -129,6 +129,11 @@ sub login {
 
     my $data = $extract_data->($res);
 
+    # TODO: make it possible to use tfa
+    if ($data->{ticket} =~ m/^PVE:tfa!/) {
+	die "TFA in API is not yet implemented! Try disabling TFA for the user.\n";
+    }
+
     $self->update_ticket($data->{ticket});
     $self->update_csrftoken($data->{CSRFPreventionToken});
 
