@@ -92,6 +92,23 @@ sub update_ticket {
     $agent->default_header('Cookie', $cookie);
 }
 
+sub two_factor_auth_login {
+    my ($self, $type, $challenge) = @_;
+
+    if ($type eq 'PVE:tfa') {
+	raise("TFA-enabled login currently works only with a TTY.") if !-t STDIN;
+	print "\nEnter OTP code for user $self->{username}: ";
+	my $tfa_response = <STDIN>;
+	chomp $tfa_response;
+	return $self->post('/api2/json/access/tfa', {response => $tfa_response});
+    } elsif ($type eq 'PVE:u2f') {
+	# TODO: implement u2f-enabled join
+	raise("U2F-enabled login is currently not implemented.");
+    } else {
+	raise("Authentication type '$type' not recognized, aborting!");
+    }
+}
+
 sub login {
     my ($self) = @_;
 
@@ -129,14 +146,16 @@ sub login {
     my $res = from_json($response->decoded_content, {utf8 => 1, allow_nonref => 1});
 
     my $data = $extract_data->($res);
-
-    # TODO: make it possible to use tfa
-    if ($data->{ticket} =~ m/^PVE:tfa!/) {
-	raise("Two Factor Auth is not yet implemented! Try disabling TFA for the user '$username'.\n");
-    }
-
     $self->update_ticket($data->{ticket});
     $self->update_csrftoken($data->{CSRFPreventionToken});
+
+    # handle two-factor login
+    my $tfa_ticket_re = qr/^([^\s!]+)![^!]*(!([0-9a-zA-Z\/.=_\-+]+))?$/;
+    if ($data->{ticket} =~ m/$tfa_ticket_re/) {
+	my ($type, $challenge) = ($1, $2);
+	$data = $self->two_factor_auth_login($type, $challenge);
+	$self->update_ticket($data->{ticket});
+    }
 
     return $data;
 }
