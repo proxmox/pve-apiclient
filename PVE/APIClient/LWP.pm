@@ -192,12 +192,13 @@ sub call {
     delete $self->{last_unknown_fingerprint};
 
     my $ticket = $self->{ticket};
+    my $apitoken = $self->{apitoken};
 
     my $ua = $self->{useragent};
 
     # fixme: check ticket lifetime?
 
-    if (!$ticket && $self->{username} && $self->{password}) {
+    if (!$ticket && !$apitoken && $self->{username} && $self->{password}) {
 	$self->login();
     }
 
@@ -346,9 +347,26 @@ sub new {
 
     $self->{useragent}->default_header('Accept-Encoding' => 'gzip'); # allow gzip
 
-    $self->update_ticket($param{ticket}) if $param{ticket};
+    if ($param{apitoken} && $param{password}) {
+	warn "password will be ignored in favor of API token\n";
+	delete $self->{password};
+    }
+    if ($param{ticket}) {
+	if ($param{apitoken}) {
+	    warn "ticket will be ignored in favor of API token\n";
+	} else {
+	    $self->update_ticket($param{ticket});
+	}
+    }
     $self->update_csrftoken($param{csrftoken}) if $param{csrftoken};
 
+    if ($param{apitoken}) {
+	my $agent = $self->{useragent};
+
+	$self->{apitoken} = $param{apitoken};
+
+	$agent->default_header('Authorization', $param{apitoken});
+    }
 
     return $self;
 }
