@@ -1,3 +1,11 @@
+libpve-apiclient-perl (3.0-3) pve pmg; urgency=medium
+
+  * implement API token support and add a example
+
+  * fix #2227: enable totp codes to be passed in cli
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 07 Feb 2020 07:53:51 +0100
+
 libpve-apiclient-perl (3.0-2) pve pmg; urgency=medium
 
   * check if API user has TFA setup and abort with better error message in that
