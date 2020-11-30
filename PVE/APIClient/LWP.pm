@@ -122,7 +122,7 @@ sub login {
     my $ua = $self->{useragent};
     my $username = $self->{username} // 'unknown',
 
-    delete $self->{last_unknown_fingerprint};
+    delete $self->{fingerprint}->{last_unknown};
 
     my $exec_login = sub {
 	return $ua->post($uri, {
@@ -133,7 +133,7 @@ sub login {
     my $response = $exec_login->();
 
     if (!$response->is_success) {
-	if (my $fp = delete($self->{last_unknown_fingerprint})) {
+	if (my $fp = delete($self->{fingerprint}->{last_unknown})) {
 	    if ($self->manual_verify_fingerprint($fp)) {
 		$response = $exec_login->(); # try again
 	    }
@@ -176,7 +176,7 @@ sub manual_verify_fingerprint {
 
     my $valid = ($answer =~ m/^\s*yes\s*$/i) ? 1 : 0;
 
-    $self->{cached_fingerprints}->{$fingerprint} = $valid;
+    $self->{fingerprint}->{cache}->{$fingerprint} = $valid;
 
     raise("Fingerprint not verified, abort!\n") if !$valid;
 
@@ -190,7 +190,7 @@ sub manual_verify_fingerprint {
 sub call {
     my ($self, $method, $path, $param) = @_;
 
-    delete $self->{last_unknown_fingerprint};
+    delete $self->{fingerprint}->{last_unknown};
 
     my $ticket = $self->{ticket};
     my $apitoken = $self->{apitoken};
@@ -246,13 +246,11 @@ sub call {
 
     my $response = $exec_method->();
 
-    if (my $fp = delete($self->{last_unknown_fingerprint})) {
+    if (my $fp = delete($self->{fingerprint}->{last_unknown})) {
 	if ($self->manual_verify_fingerprint($fp)) {
 	    $response = $exec_method->(); # try again
 	}
     }
-
-    #print "RESP: " . Dumper($response) . "\n";
 
     my $ct = $response->header('Content-Type') || '';
 
@@ -276,24 +274,24 @@ sub call {
     }
 }
 
-my $verify_cert_callback = sub {
-    my ($self, $cert) = @_;
+my sub verify_cert_callback {
+    my ($fingerprint, $cert, $verify_cb) = @_;
 
     # check server certificate against cache of pinned FPs
     # get fingerprint of server certificate
     my $fp = Net::SSLeay::X509_get_fingerprint($cert, 'sha256');
     return 0 if !defined($fp) || $fp eq ''; # error
 
-    my $valid = $self->{cached_fingerprints}->{$fp};
+    my $valid = $fingerprint->{cache}->{$fp};
     return $valid if defined($valid); # return cached result
 
-    if (my $cb = $self->{verify_fingerprint_cb}) {
-	$valid = $cb->($cert);
-	$self->{cached_fingerprints}->{$fp} = $valid;
+    if ($verify_cb) {
+	$valid = $verify_cb->($cert);
+	$fingerprint->{cache}->{$fp} = $valid;
 	return $valid;
     }
 
-    $self->{last_unknown_fingerprint} = $fp;
+    $fingerprint->{last_unknown} = $fp;
 
     return 0;
 };
@@ -312,8 +310,10 @@ sub new {
 	protocol => $param{protocol},
 	cookie_name => $param{cookie_name} // 'PVEAuthCookie',
 	manual_verification => $param{manual_verification},
-	cached_fingerprints => $param{cached_fingerprints} || {},
-	verify_fingerprint_cb => $param{verify_fingerprint_cb},
+	fingerprint => {
+	    cache => $param{cached_fingerprints} || {},
+	    last_unknown => undef,
+	},
 	register_fingerprint_cb => $param{register_fingerprint_cb},
 	ssl_opts => $ssl_opts,
 	timeout => $param{timeout} || 60,
@@ -322,13 +322,16 @@ sub new {
 
     if (!$ssl_opts->{SSL_verify_callback}) {
 	$ssl_opts->{'SSL_verify_mode'} = SSL_VERIFY_PEER;
+
+	my $fingerprint = $self->{fingerprint}; # avoid passing $self, that's a RC cycle!
+	my $verify_fingerprint_cb = $param{verify_fingerprint_cb};
 	$ssl_opts->{'SSL_verify_callback'} = sub {
 	    my (undef, undef, undef, undef, $cert, $depth) = @_;
 
 	    # we don't care about intermediate or root certificates
 	    return 1 if $depth != 0;
 
-	    return $verify_cert_callback->($self, $cert);
+	    return verify_cert_callback($fingerprint, $cert, $verify_fingerprint_cb);
 	}
     }
 
