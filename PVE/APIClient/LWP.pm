@@ -2,15 +2,16 @@ package PVE::APIClient::LWP;
 
 use strict;
 use warnings;
-use URI;
-use IO::Socket::SSL; # important for SSL_verify_callback
-use LWP::UserAgent;
-use URI::Escape;
-use Net::SSLeay;
-use JSON;
-use Data::Dumper; # fixme: remove
-use HTTP::Request::Common;
+
 use Carp;
+use HTTP::Request::Common;
+use IO::Socket::SSL; # important for SSL_verify_callback
+use JSON;
+use LWP::UserAgent;
+use Net::SSLeay;
+use URI::Escape;
+use URI;
+
 use PVE::APIClient::Exception qw(raise);
 
 my $extract_data = sub {
