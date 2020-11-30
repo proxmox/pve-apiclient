@@ -1,3 +1,10 @@
+libpve-apiclient-perl (3.1-1) pve pmg; urgency=medium
+
+  * rework sharing data with the openssl certificate verify callback to avoid
+    creating a refcount cycle, slowly using up all memory
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 30 Nov 2020 15:30:20 +0100
+
 libpve-apiclient-perl (3.0-3) pve pmg; urgency=medium
 
   * implement API token support and add a example
