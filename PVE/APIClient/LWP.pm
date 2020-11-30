@@ -315,7 +315,6 @@ sub new {
 	    last_unknown => undef,
 	},
 	register_fingerprint_cb => $param{register_fingerprint_cb},
-	ssl_opts => $ssl_opts,
 	timeout => $param{timeout} || 60,
     };
     bless $self;
