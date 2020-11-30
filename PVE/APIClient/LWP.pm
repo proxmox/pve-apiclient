@@ -317,7 +317,7 @@ sub new {
 	register_fingerprint_cb => $param{register_fingerprint_cb},
 	timeout => $param{timeout} || 60,
     };
-    bless $self;
+    bless $self, $class;
 
     if (!$ssl_opts->{SSL_verify_callback}) {
 	$ssl_opts->{'SSL_verify_mode'} = SSL_VERIFY_PEER;
