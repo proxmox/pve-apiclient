@@ -127,7 +127,8 @@ sub login {
     my $exec_login = sub {
 	return $ua->post($uri, {
 	    username => $username,
-	    password => $self->{password} || ''});
+	    password => $self->{password} || ''
+	});
     };
 
     my $response = $exec_login->();
@@ -322,7 +323,7 @@ sub new {
     if (!$ssl_opts->{SSL_verify_callback}) {
 	$ssl_opts->{'SSL_verify_mode'} = SSL_VERIFY_PEER;
 
-	my $fingerprint = $self->{fingerprint}; # avoid passing $self, that's a RC cycle!
+	my $fingerprints = $self->{fingerprint}; # avoid passing $self, that's a RC cycle!
 	my $verify_fingerprint_cb = $param{verify_fingerprint_cb};
 	$ssl_opts->{'SSL_verify_callback'} = sub {
 	    my (undef, undef, undef, undef, $cert, $depth) = @_;
@@ -330,7 +331,7 @@ sub new {
 	    # we don't care about intermediate or root certificates
 	    return 1 if $depth != 0;
 
-	    return verify_cert_callback($fingerprint, $cert, $verify_fingerprint_cb);
+	    return verify_cert_callback($fingerprints, $cert, $verify_fingerprint_cb);
 	}
     }
 
