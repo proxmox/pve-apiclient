@@ -99,8 +99,13 @@ sub raise_param_exc {
 
 sub stringify {
     my $self = shift;
-    
-    my $msg = $self->{code} ? "$self->{code} $self->{msg}" : $self->{msg};
+
+    my $msg = $self->{msg};
+    if (my $code = $self->{code}) {
+	if ($msg !~ /^\s*\Q$code\E[\s:,]/) { # avoid duplicating the error code heuristically
+	    $msg = "$code $msg";
+	}
+    }
 
     if ($msg !~ m/\n$/) {
 
