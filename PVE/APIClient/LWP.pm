@@ -300,9 +300,17 @@ my sub verify_cert_callback {
 sub new {
     my ($class, %param) = @_;
 
-    my $ssl_default_opts = { verify_hostname => 0 };
-    my $ssl_opts = $param{ssl_opts} || $ssl_default_opts;
+    my $ssl_opts = $param{ssl_opts} || {};
 
+    if (!defined($ssl_opts->{verify_hostname})) {
+	if (scalar(keys $param{cached_fingerprints}->%*) > 0) {
+	    # purely trust the configured fingerprints, by default
+	    $ssl_opts->{verify_hostname} = 0;
+	} else {
+	    # no fingerprints passed, enforce hostname verification, by default
+	    $ssl_opts->{verify_hostname} = 1;
+	}
+    }
     # we can only really trust openssl result if it also verifies the hostname,
     # else it's easy to intercept (MITM using valid Lets Encrypt)
     my $trust_openssl = $ssl_opts->{verify_hostname} ? 1 : 0;
