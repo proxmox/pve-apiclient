@@ -303,6 +303,10 @@ sub new {
     my $ssl_default_opts = { verify_hostname => 0 };
     my $ssl_opts = $param{ssl_opts} || $ssl_default_opts;
 
+    # we can only really trust openssl result if it also verifies the hostname,
+    # else it's easy to intercept (MITM using valid Lets Encrypt)
+    my $trust_openssl = $ssl_opts->{verify_hostname} ? 1 : 0;
+
     my $self = {
 	username => $param{username},
 	password => $param{password},
@@ -326,10 +330,12 @@ sub new {
 	my $fingerprints = $self->{fingerprint}; # avoid passing $self, that's a RC cycle!
 	my $verify_fingerprint_cb = $param{verify_fingerprint_cb};
 	$ssl_opts->{'SSL_verify_callback'} = sub {
-	    my (undef, undef, undef, undef, $cert, $depth) = @_;
+	    my ($openssl_valid, undef, undef, undef, $cert, $depth) = @_;
 
 	    # we don't care about intermediate or root certificates
 	    return 1 if $depth != 0;
+
+	    return 1 if $trust_openssl && $openssl_valid;
 
 	    return verify_cert_callback($fingerprints, $cert, $verify_fingerprint_cb);
 	}
