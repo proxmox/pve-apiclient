@@ -1,3 +1,15 @@
+libpve-apiclient-perl (3.1-2) pve pmg; urgency=medium
+
+  * client exception: try to avoid HTTP code duplication in error string
+
+  * certificate verification: trust openssl result if the hostname is getting
+    verified
+
+  * default to verifying hostname with the certificate one if no fingerprint is
+    passed
+
+ -- Proxmox Support Team <support@proxmox.com>  Thu, 03 Dec 2020 16:09:02 +0100
+
 libpve-apiclient-perl (3.1-1) pve pmg; urgency=medium
 
   * rework sharing data with the openssl certificate verify callback to avoid
