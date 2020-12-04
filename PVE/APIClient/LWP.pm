@@ -353,7 +353,13 @@ sub new {
 	$self->{port} = $self->{host} eq 'localhost' ? 85 : 8006;
     }
     if (!$self->{protocol}) {
-	$self->{protocol} = $self->{host} eq 'localhost' ? 'http' : 'https';
+	# cope that PBS and PVE can be installed on the same host, and one may thus use
+	# 'localhost' then - so only default to http for privileged ports, in that case,
+	# as the HTTP daemons normally run with those (e.g., 85 or 87)
+	$self->{protocol} = $self->{host} eq 'localhost' && $self->{port} < 1024
+	    ? 'http'
+	    : 'https'
+	    ;
     }
 
     $self->{useragent} = LWP::UserAgent->new(
