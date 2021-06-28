@@ -1,3 +1,9 @@
+libpve-apiclient-perl (3.2-1) pve pmg; urgency=medium
+
+  * bump version for Debian 11 Bullseye based releases
+
+ -- Proxmox Support Team <support@proxmox.com>  Mon, 28 Jun 2021 16:45:24 +0200
+
 libpve-apiclient-perl (3.1-3) pve pmg; urgency=medium
 
   * improve protocol selection heuristic when using 'localhost'
