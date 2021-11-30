@@ -93,7 +93,7 @@ sub update_ticket {
     $agent->default_header('Cookie', $cookie);
 }
 
-sub two_factor_auth_login {
+my sub two_factor_auth_login_old : prototype($$$) {
     my ($self, $type, $challenge) = @_;
 
     if ($type eq 'PVE:tfa') {
@@ -110,6 +110,74 @@ sub two_factor_auth_login {
     }
 }
 
+my sub extra_login_params : prototype($) {
+    my ($self) = @_;
+    return $self->{pve_new_format} ? ('new-format' => 1) : ();
+}
+
+my sub two_factor_auth_login : prototype($$$) {
+    my ($self, $challenge, $ticket) = @_;
+
+    raise("TFA-enabled login currently works only with a TTY.") if !-t STDIN;
+
+    $challenge = eval { from_json($challenge, { utf8 => 1 }) };
+    if (my $err = $@) {
+	raise("Bad TFA challenge: $err");
+    }
+    raise("Bad TFA challenge!") if !$challenge;
+
+    my @available;
+    push @available, 'totp' if $challenge->{totp};
+    push @available, 'recovery' if $challenge->{recovery};
+    push @available, 'yubico' if $challenge->{yubico};
+
+    my $selected;
+    if (@available == 1) {
+	$selected = $available[0];
+    } elsif (@available > 1) {
+	while (!defined($selected)) {
+	    print "Available TFA methods:\n";
+	    print "$_: $available[$_]\n" for (0..(@available - 1));
+	    print "Select TFA method: ";
+	    STDOUT->flush;
+	    my $response = <STDIN>;
+	    if ($response =~ /^\s*(\d+)\s*$/) {
+		$selected = int($response);
+	    }
+	}
+	$selected = $available[$selected];
+    } else {
+	raise("TFA required, but available authentication types are not supported, aborting!");
+    }
+
+    if ($selected eq 'recovery') {
+	my $keys = $challenge->{recovery};
+	if (@$keys <= 3) {
+	    print("WARNING: Few recovery keys remaining: ");
+	} else {
+	    print("The following recovery codes are available: ");
+	}
+	print(join(', ', @$keys), "\n");
+    }
+
+    print "Enter $selected code for user $self->{username}: ";
+    STDOUT->flush;
+    my $tfa_response = <STDIN>;
+    chomp $tfa_response;
+
+    return $self->post(
+	'/api2/json/access/ticket',
+	{
+	    username => $self->{username},
+	    password => "$selected:$tfa_response",
+	    'tfa-challenge' => $ticket,
+	    (extra_login_params($self))
+	},
+    );
+}
+
+my $new_tfa_ticket_re = qr/^[^\s:]+:!tfa!([^:]+):/;
+my $old_tfa_ticket_re = qr/^([^\s!]+)![^!]*(!([0-9a-zA-Z\/.=_\-+]+))?$/;
 sub login {
     my ($self) = @_;
 
@@ -127,7 +195,8 @@ sub login {
     my $exec_login = sub {
 	return $ua->post($uri, {
 	    username => $username,
-	    password => $self->{password} || ''
+	    password => $self->{password} || '',
+	    (extra_login_params($self))
 	});
     };
 
@@ -152,10 +221,15 @@ sub login {
     $self->update_csrftoken($data->{CSRFPreventionToken});
 
     # handle two-factor login
-    my $tfa_ticket_re = qr/^([^\s!]+)![^!]*(!([0-9a-zA-Z\/.=_\-+]+))?$/;
-    if ($data->{ticket} =~ m/$tfa_ticket_re/) {
+    my $ticket = $data->{ticket};
+    if ($ticket =~ $new_tfa_ticket_re) {
+	my $challenge = uri_unescape($1);
+	$data = two_factor_auth_login($self, $challenge, $ticket);
+	$self->update_ticket($data->{ticket});
+    } elsif ($ticket =~ $old_tfa_ticket_re) {
+	# handle old-style two-factor login for PVE:
 	my ($type, $challenge) = ($1, $2);
-	$data = $self->two_factor_auth_login($type, $challenge);
+	$data = two_factor_auth_login_old($self, $type, $challenge);
 	$self->update_ticket($data->{ticket});
     }
 
@@ -329,6 +403,7 @@ sub new {
 	},
 	register_fingerprint_cb => $param{register_fingerprint_cb},
 	timeout => $param{timeout} || 60,
+	pve_new_format => $param{pve_new_format},
     };
     bless $self, $class;
 
