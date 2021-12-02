@@ -147,7 +147,7 @@ my sub two_factor_auth_login : prototype($$$) {
 	}
 	$selected = $available[$selected];
     } else {
-	raise("TFA required, but available authentication types are not supported, aborting!");
+	raise("TFA required, but none of the configure factors is supported over TTY, aborting!");
     }
 
     if ($selected eq 'recovery') {
