@@ -89,7 +89,7 @@ sub update_ticket {
     $self->{ticket} = $ticket;
 
     my $encticket = uri_escape($ticket);
-    my $cookie = "$self->{cookie_name}=$encticket; path=/; secure;";
+    my $cookie = "$self->{cookie_name}=$encticket; path=/; secure; SameSite=Strict;";
     $agent->default_header('Cookie', $cookie);
 }
 
