@@ -16,10 +16,11 @@ all: $(DEB)
 
 .PHONY: $(BUILDSRC)
 $(BUILDSRC):
-	rm -rf $(BUILDSRC)
-	rsync -a debian $(BUILDSRC)
-	make DESTDIR=./$(BUILDSRC) install
-	echo "git clone git://git.proxmox.com/git/pve-apiclient.git\\ngit checkout $(GITVERSION)" > $(BUILDSRC)/debian/SOURCE
+	rm -rf $@ $@.tmp
+	cp -a src $@.tmp
+	cp -a debian $@.tmp/
+	echo "git clone git://git.proxmox.com/git/pve-apiclient.git\\ngit checkout $(GITVERSION)" >$@.tmp/debian/SOURCE
+	mv $@.tmp $@
 
 .PHONY: deb
 deb $(DEB): $(BUILDSRC)
@@ -30,14 +31,6 @@ deb $(DEB): $(BUILDSRC)
 dsc: $(BUILDSRC)
 	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d -nc
 	lintian $(DSC)
-
-install: PVE/APIClient/Exception.pm PVE/APIClient/LWP.pm examples/*.pl
-	install -D -m 0644 PVE/APIClient/LWP.pm $(PERL5DIR)/PVE/APIClient/LWP.pm
-	install -m 0644 PVE/APIClient/Exception.pm $(PERL5DIR)/PVE/APIClient/Exception.pm
-	install -d -m 755 $(DOCDIR)/examples
-	install -m 0755 examples/example1.pl $(DOCDIR)/examples
-	install -m 0755 examples/example2.pl $(DOCDIR)/examples
-	install -m 0755 examples/perftest1.pl $(DOCDIR)/examples
 
 .PHONY: upload
 upload: $(DEB)
