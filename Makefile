@@ -32,6 +32,9 @@ $(DSC): $(BUILDSRC)
 	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d
 	lintian $(DSC)
 
+sbuild: $(DSC)
+	sbuild $(DSC)
+
 .PHONY: upload
 upload: $(DEB)
 	tar cf - $(DEB) | ssh -X repoman@repo.proxmox.com upload --product pmg,pve --dist bullseye
