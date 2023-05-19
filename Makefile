@@ -14,7 +14,6 @@ GITVERSION:=$(shell git rev-parse HEAD)
 
 all: $(DEB)
 
-.PHONY: $(BUILDSRC)
 $(BUILDSRC):
 	rm -rf $@ $@.tmp
 	cp -a src $@.tmp
@@ -24,12 +23,13 @@ $(BUILDSRC):
 
 .PHONY: deb
 deb $(DEB): $(BUILDSRC)
-	cd $(BUILDSRC); dpkg-buildpackage -rfakeroot -b -us -uc
+	cd $(BUILDSRC); dpkg-buildpackage -b -us -uc
 	lintian $(DEB)
 
 .PHONY: dsc
-dsc: $(BUILDSRC)
-	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d -nc
+dsc: $(DSC)
+$(DSC): $(BUILDSRC)
+	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d
 	lintian $(DSC)
 
 .PHONY: upload
