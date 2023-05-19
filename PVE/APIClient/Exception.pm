@@ -1,5 +1,8 @@
 package PVE::APIClient::Exception;
 
+# NOTE: derived from pve-common's PVE::Execption by copying and then:
+# sed -i 's/PVE::/PVE::APIClient::/g' Exception.pm
+
 # a way to add more information to exceptions (see man perlfunc (die))
 # use PVE::APIClient::Exception qw(raise);
 # raise ("my error message", code => 400, errors => { param1 => "err1", ...} );

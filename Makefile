@@ -11,9 +11,6 @@ DESTDIR=
 PERL5DIR=$(DESTDIR)/usr/share/perl5
 DOCDIR=$(DESTDIR)/usr/share/doc/$(PACKAGE)
 
-PVE_COMMON_FILES=    		\
-	Exception.pm
-
 GITVERSION:=$(shell git rev-parse HEAD)
 
 all: $(DEB)
@@ -42,10 +39,6 @@ install:
 	install -m 0755 examples/example1.pl $(DOCDIR)/examples
 	install -m 0755 examples/example2.pl $(DOCDIR)/examples
 	install -m 0755 examples/perftest1.pl $(DOCDIR)/examples
-
-update-pve-common:
-	for i in $(PVE_COMMON_FILES); do cp ../pve-common/src/PVE/$$i PVE/APIClient/; done
-	for i in $(PVE_COMMON_FILES); do sed -i 's/PVE::/PVE::APIClient::/g' PVE/APIClient/$$i; done
 
 .PHONY: upload
 upload: $(DEB)
