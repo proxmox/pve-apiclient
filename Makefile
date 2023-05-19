@@ -1,13 +1,12 @@
-PACKAGE=libpve-apiclient-perl
-PKGVER=$(shell dpkg-parsechangelog -Sversion | cut -d- -f1)
-PKGREL=$(shell dpkg-parsechangelog -Sversion | cut -d- -f2)
+include /usr/share/dpkg/default.mk
 
-BUILDSRC := $(PACKAGE)-$(PKGVER)
-DEB=$(PACKAGE)_$(PKGVER)-$(PKGREL)_all.deb
-DSC=$(PACKAGE)_$(PKGVER)-$(PKGREL).dsc
+PACKAGE=libpve-apiclient-perl
+
+BUILDSRC := $(PACKAGE)-$(DEB_VERSION)
+DEB=$(PACKAGE)_$(DEB_VERSION)_all.deb
+DSC=$(PACKAGE)_$(DEB_VERSION).dsc
 
 DESTDIR=
-
 PERL5DIR=$(DESTDIR)/usr/share/perl5
 DOCDIR=$(DESTDIR)/usr/share/doc/$(PACKAGE)
 
