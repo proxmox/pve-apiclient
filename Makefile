@@ -44,9 +44,8 @@ upload: $(DEB)
 	tar cf - $(DEB) | ssh -X repoman@repo.proxmox.com upload --product pmg,pve --dist bullseye
 
 distclean: clean
-
 clean:
-	rm -rf ./$(BUILDSRC) *.deb *.changes *.buildinfo *.dsc *.tar.gz
+	rm -rf $(PACKAGE)-[0-9]*/ *.deb *.changes *.buildinfo *.build *.dsc *.tar.*
 
 .PHONY: dinstall
 dinstall: $(DEB)
