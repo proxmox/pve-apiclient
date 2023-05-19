@@ -31,7 +31,7 @@ dsc: $(BUILDSRC)
 	cd $(BUILDSRC); dpkg-buildpackage -S -us -uc -d -nc
 	lintian $(DSC)
 
-install:
+install: PVE/APIClient/Exception.pm PVE/APIClient/LWP.pm examples/*.pl
 	install -D -m 0644 PVE/APIClient/LWP.pm $(PERL5DIR)/PVE/APIClient/LWP.pm
 	install -m 0644 PVE/APIClient/Exception.pm $(PERL5DIR)/PVE/APIClient/Exception.pm
 	install -d -m 755 $(DOCDIR)/examples
