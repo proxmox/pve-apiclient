@@ -1,3 +1,9 @@
+libpve-apiclient-perl (3.3.1) bookworm; urgency=medium
+
+  * lwp: set SameSite attr of auth cookie to 'strict'
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 09 Jun 2023 07:54:37 +0200
+
 libpve-apiclient-perl (3.3.0) bookworm; urgency=medium
 
   * re-build for Debian 12 Bookworm based releases
