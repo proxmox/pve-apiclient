@@ -415,11 +415,18 @@ sub new {
 	$ssl_opts->{'SSL_verify_callback'} = sub {
 	    my ($openssl_valid, undef, undef, undef, $cert, $depth) = @_;
 
-	    # we don't care about intermediate or root certificates
-	    return 1 if $depth != 0;
-
 	    return 1 if $trust_openssl && $openssl_valid;
 
+	    # Openssl encountered validation error, only allow validation to
+	    # pass if fingerprint is verified
+	    $trust_openssl = 0;
+
+	    # We don't care about intermediate or root certificates if we don't
+	    # trust openssl's validation result
+	    return 1 if $depth != 0;
+
+	    # We've reached the leaf certificate and the chain didn't pass
+	    # openssl's validation - let's verify the fingerprint!
 	    return verify_cert_callback($fingerprints, $cert, $verify_fingerprint_cb);
 	}
     }
