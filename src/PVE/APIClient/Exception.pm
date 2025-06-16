@@ -16,7 +16,7 @@ use HTTP::Status qw(:constants);
 
 @ISA = qw(Exporter);
 
-use overload '""' => sub {local $@; shift->stringify};
+use overload '""' => sub { local $@; shift->stringify };
 use overload 'cmp' => sub {
     my ($a, $b) = @_;
     local $@;
@@ -31,13 +31,13 @@ sub new {
     $class = ref($class) || $class;
 
     my $self = {
-	msg => $msg,
+        msg => $msg,
     };
 
     foreach my $p (keys %param) {
-	next if defined($self->{$p});
-	my $v = $param{$p};
-	$self->{$p} = ref($v) ? dclone($v) : $v;
+        next if defined($self->{$p});
+        my $v = $param{$p};
+        $self->{$p} = ref($v) ? dclone($v) : $v;
     }
 
     return bless $self;
@@ -84,8 +84,8 @@ sub raise_param_exc {
     my ($errors, $usage) = @_;
 
     my $param = {
-	 code => HTTP_BAD_REQUEST,
-	 errors => $errors,
+        code => HTTP_BAD_REQUEST,
+        errors => $errors,
     };
 
     $param->{usage} = $usage if $usage;
@@ -105,35 +105,35 @@ sub stringify {
 
     my $msg = $self->{msg};
     if (my $code = $self->{code}) {
-	if ($msg !~ /^\s*\Q$code\E[\s:,]/) { # avoid duplicating the error code heuristically
-	    $msg = "$code $msg";
-	}
+        if ($msg !~ /^\s*\Q$code\E[\s:,]/) { # avoid duplicating the error code heuristically
+            $msg = "$code $msg";
+        }
     }
 
     if ($msg !~ m/\n$/) {
 
-	if ($self->{filename} && $self->{line}) {
-	    $msg .= " at $self->{filename} line $self->{line}";
-	}
+        if ($self->{filename} && $self->{line}) {
+            $msg .= " at $self->{filename} line $self->{line}";
+        }
 
-	$msg .= "\n";
+        $msg .= "\n";
     }
 
     if ($self->{errors}) {
-	foreach my $e (keys %{$self->{errors}}) {
-	    $msg .= "$e: $self->{errors}->{$e}\n";
-	}
+        foreach my $e (keys %{ $self->{errors} }) {
+            $msg .= "$e: $self->{errors}->{$e}\n";
+        }
     }
 
     if ($self->{propagate}) {
-	foreach my $pi (@{$self->{propagate}}) {
-	    $msg .= "\t...propagated at $pi->[0] line $pi->[1]\n";
-	}
+        foreach my $pi (@{ $self->{propagate} }) {
+            $msg .= "\t...propagated at $pi->[0] line $pi->[1]\n";
+        }
     }
 
     if ($self->{usage}) {
-	$msg .= $self->{usage};
-	$msg .= "\n" if $msg !~ m/\n$/;
+        $msg .= $self->{usage};
+        $msg .= "\n" if $msg !~ m/\n$/;
     }
 
     return $msg;
@@ -142,7 +142,7 @@ sub stringify {
 sub PROPAGATE {
     my ($self, $file, $line) = @_;
 
-    push @{$self->{propagate}}, [$file, $line];
+    push @{ $self->{propagate} }, [$file, $line];
 
     return $self;
 }

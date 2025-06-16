@@ -23,7 +23,7 @@ my $csrftoken = PVE::AccessControl::assemble_csrf_prevention_token('root@pam');
 
 sub get_local_cert_fingerprint {
     my ($node) = @_;
-    
+
     my $cert_path = "/etc/pve/nodes/$node/pve-ssl.pem";
     my $custom_cert_path = "/etc/pve/nodes/$node/pveproxy-ssl.pem";
 
@@ -49,8 +49,9 @@ my $conn = PVE::APIClient::LWP->new(
     host => $hostname,
     # add local hosts cert fingerprint
     cached_fingerprints => {
-	$local_fingerprint => 1,
-    });
+        $local_fingerprint => 1,
+    },
+);
 
 my $res = $conn->get("api2/json/access/domains", {});
-print to_json($res, { pretty => 1, canonical => 1});
+print to_json($res, { pretty => 1, canonical => 1 });

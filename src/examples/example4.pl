@@ -37,4 +37,4 @@ my $conn = PVE::APIClient::LWP->new(
 );
 
 my $res = $conn->get("api2/json/version", {});
-print to_json($res, { pretty => 1, canonical => 1, utf8 => 1});
+print to_json($res, { pretty => 1, canonical => 1, utf8 => 1 });

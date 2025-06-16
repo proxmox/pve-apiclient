@@ -29,8 +29,8 @@ my $conn = PVE::APIClient::LWP->new(
     host => $hostname,
     # allow manual fingerprint verification
     manual_verification => 1,
-    );
+);
 
 my $res = $conn->get("/", {});
 
-print to_json($res, { pretty => 1, canonical => 1});
+print to_json($res, { pretty => 1, canonical => 1 });
