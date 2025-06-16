@@ -14,6 +14,10 @@ GITVERSION:=$(shell git rev-parse HEAD)
 
 all: $(DEB)
 
+.PHONY: tidy
+tidy:
+	git ls-files ':*.p[ml]'| xargs -n4 -P0 proxmox-perltidy
+
 $(BUILDSRC):
 	rm -rf $@ $@.tmp
 	cp -a src $@.tmp
