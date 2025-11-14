@@ -276,18 +276,15 @@ sub call {
 
     my $ua = $self->{useragent};
 
-    if ($ticket && $ticket =~ m/^(\S+)::[^:\s]+$/) {
-        my $plain = $1;
+    if ($ticket && $ticket =~ m/^\S+:([A-Z0-9]{8})::[^:\s]+$/) {
+        # only the last 8 characters from the plain part are the ticket-creation timestamp
+        my $ticket_ctime_str = $1;
+        my $ticket_ctime = hex($ticket_ctime_str);
+        my $ticket_age = time() - $ticket_ctime;
 
-        # only the last 8 characters from the plain part are the timestamp
-        if ($plain =~ m/([A-Z0-9]{8})$/) {
-            my $timestamp = $1;
-            my $ttime = hex($timestamp);
-            my $age = time() - $ttime;
-
-            if ($age > 3600) { # older than one hour
-                $self->login();
-            }
+        # tickets have a 2 hour lifetime, so renew transparently once it's older than one hour
+        if ($ticket_age > 3600) {
+            $self->login();
         }
     }
 
