@@ -276,7 +276,26 @@ sub call {
 
     my $ua = $self->{useragent};
 
-    # fixme: check ticket lifetime?
+    if ($ticket && $ticket =~ m/^(\S+)::[^:\s]+$/) {
+        my $plain = $1;
+
+        # only the last 8 characters from the plain part are the timestamp
+        if ($plain =~ m/([A-Z0-9]{8})$/) {
+            my $timestamp = $1;
+            my $ttime = hex($timestamp);
+            my $age = time() - $ttime;
+
+            if ($age > 3600) { # older than one hour
+                if (!defined($self->{password})) {
+                    $self->{password} = $ticket;
+                    $self->login();
+                    $self->{password} = undef;
+                } else {
+                    $self->login();
+                }
+            }
+        }
+    }
 
     if (!$ticket && !$apitoken && $self->{username} && $self->{password}) {
         $self->login();
