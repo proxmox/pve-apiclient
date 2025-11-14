@@ -486,12 +486,17 @@ sub new {
     }
     $self->update_csrftoken($param{csrftoken}) if $param{csrftoken};
 
-    if ($param{apitoken}) {
+    if (my $api_token = $param{apitoken}) {
         my $agent = $self->{useragent};
 
-        $self->{apitoken} = $param{apitoken};
+        my $auth_header = $api_token;
+        if ($auth_header !~ /^\w+(?:=| )/) {
+            my $apitoken_name = $param{api_token_name} // 'PVEAPIToken';
+            $auth_header = "${apitoken_name}=${api_token}";
+        }
 
-        $agent->default_header('Authorization', $param{apitoken});
+        $self->{apitoken} = $api_token;
+        $agent->default_header('Authorization', $auth_header);
     }
 
     return $self;
