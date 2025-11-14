@@ -198,7 +198,7 @@ sub login {
             $uri,
             {
                 username => $username,
-                password => $self->{password} || '',
+                password => $self->{password} || $self->{ticket} || '',
                 (extra_login_params($self)),
             },
         );
@@ -286,13 +286,7 @@ sub call {
             my $age = time() - $ttime;
 
             if ($age > 3600) { # older than one hour
-                if (!defined($self->{password})) {
-                    $self->{password} = $ticket;
-                    $self->login();
-                    $self->{password} = undef;
-                } else {
-                    $self->login();
-                }
+                $self->login();
             }
         }
     }
