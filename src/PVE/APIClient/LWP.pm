@@ -486,7 +486,7 @@ sub new {
     }
     $self->update_csrftoken($param{csrftoken}) if $param{csrftoken};
 
-    if (my $api_token = $param{apitoken}) {
+    if (my $api_token = $param{api_token} // $param{apitoken}) {
         my $agent = $self->{useragent};
 
         my $auth_header = $api_token;
