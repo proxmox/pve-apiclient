@@ -1,3 +1,13 @@
+libpve-apiclient-perl (3.4.2) trixie; urgency=medium
+
+  * constructor: transparently add API token name in Authorization
+    header and allow one to override through new api_token_name parameter
+
+  * constructor: accept api_token parameter name as alternative to apitoken
+    one.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 14 Nov 2025 18:56:09 +0100
+
 libpve-apiclient-perl (3.4.1) trixie; urgency=medium
 
   * Before executing a request, check the age of the login ticket. If it
