@@ -189,9 +189,9 @@ sub login {
     $uri->path('/api2/json/access/ticket');
 
     my $ua = $self->{useragent};
-    my $username = $self->{username} // 'unknown',
+    my $username = $self->{username} // 'unknown';
 
-        delete $self->{fingerprint}->{last_unknown};
+    delete $self->{fingerprint}->{last_unknown};
 
     my $exec_login = sub {
         return $ua->post(
