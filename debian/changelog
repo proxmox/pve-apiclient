@@ -1,3 +1,10 @@
+libpve-apiclient-perl (3.4.1) trixie; urgency=medium
+
+  * Before executing a request, check the age of the login ticket. If it
+    exists and is over an hour old, auto-renew it through a new login.
+
+ -- Proxmox Support Team <support@proxmox.com>  Fri, 14 Nov 2025 17:05:03 +0100
+
 libpve-apiclient-perl (3.4.0) trixie; urgency=medium
 
   * re-build for Debian 13 Trixie based releases.
