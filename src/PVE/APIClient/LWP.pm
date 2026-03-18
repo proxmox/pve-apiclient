@@ -332,6 +332,7 @@ sub call {
             );
 
         } elsif ($method eq 'DELETE') {
+            $uri->query_form($param) if $param;
             $response = $ua->request(HTTP::Request::Common::DELETE($uri));
         } else {
             raise("method $method not implemented\n");
