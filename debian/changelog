@@ -1,3 +1,10 @@
+libpve-apiclient-perl (3.4.3) trixie; urgency=medium
+
+  * Pass parameters for DELETE requests as query string. They were silently
+    ignored before.
+
+ -- Proxmox Support Team <support@proxmox.com>  Tue, 25 Aug 2026 11:36:07 +0200
+
 libpve-apiclient-perl (3.4.2) trixie; urgency=medium
 
   * constructor: transparently add API token name in Authorization
